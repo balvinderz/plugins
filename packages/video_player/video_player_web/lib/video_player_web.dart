@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
-
+import 'hls.dart';
+import 'package:js/js.dart';
 // An error code value to error name Map.
 // See: https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
 const Map<int, String> _kErrorValueToErrorName = {
@@ -34,6 +35,7 @@ const String _kDefaultErrorMessage =
 ///
 /// This class implements the `package:video_player` functionality for the web.
 class VideoPlayerPlugin extends VideoPlayerPlatform {
+
   /// Registers this class as the default instance of [VideoPlayerPlatform].
   static void registerWith(Registrar registrar) {
     VideoPlayerPlatform.instance = VideoPlayerPlugin();
@@ -42,6 +44,7 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
   Map<int, _VideoPlayer> _videoPlayers = <int, _VideoPlayer>{};
 
   int _textureCounter = 1;
+
 
   @override
   Future<void> init() async {
@@ -129,6 +132,21 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
     _videoPlayers[textureId].sendBufferingUpdate();
     return _videoPlayers[textureId].getPosition();
   }
+  @override
+  Future<List> getAudios(int textureId) async
+  {
+    return  _videoPlayers[textureId].getAudioTracks();
+
+
+    //   return "Soja Marja";
+  }
+
+  @override
+  Future<void> setAudio(int textureId,List audio){
+    _videoPlayers[textureId].setAudio(audio[0]);
+    return null;
+
+  }
 
   @override
   Stream<VideoEvent> videoEventsFor(int textureId) {
@@ -151,6 +169,7 @@ class _VideoPlayer {
   final int textureId;
   VideoElement videoElement;
   bool isInitialized = false;
+  Hls hls;
 
   void initialize() {
     videoElement = VideoElement()
@@ -166,7 +185,19 @@ class _VideoPlayer {
     // ignore: undefined_prefixed_name
     ui.platformViewRegistry.registerViewFactory(
         'videoPlayer-$textureId', (int viewId) => videoElement);
+    hls =  Hls();
+    if(uri.toString().contains("m3u8"))
+    {
+      hls.attachMedia(videoElement);
 
+      hls.on('hlsMediaAttached',allowInterop((_,__){
+        hls.loadSource(uri.toString());
+
+      }));
+    }
+    else {
+      videoElement.src = uri.toString();
+    }
     videoElement.onCanPlay.listen((dynamic _) {
       if (!isInitialized) {
         isInitialized = true;
@@ -269,5 +300,40 @@ class _VideoPlayer {
       ));
     }
     return durationRange;
+  }
+  void setAudio(String audioTrack){
+    if(uri.toString().endsWith("m3u8"))
+    {
+      String str = "";
+      for(int i =0;i<hls.audioTracks.length;i++) {
+        if(hls.audioTracks[i].name == audioTrack) {
+          hls.audioTrack = i;
+
+          break;
+
+        }
+
+      }
+
+
+
+    }
+  }
+  List getAudioTracks(){
+    List audios = [];
+
+    if(uri.toString().contains("m3u8"))
+    {
+      String str = "";
+      for(int i =0;i<hls.audioTracks.length;i++) {
+        audios.add(hls.audioTracks[i].name);
+      }
+
+
+
+    }
+    return audios;
+
+
   }
 }

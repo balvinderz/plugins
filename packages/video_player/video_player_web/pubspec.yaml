@@ -19,8 +19,12 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   meta: ^1.1.7
-  video_player_platform_interface: ^2.0.0
-
+  video_player_platform_interface:
+    git:
+      url: https://github.com/balvinderz/plugins
+      ref: features/change_audio
+      path: packages/video_player/video_player_platform_interface
+  js: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
