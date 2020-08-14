@@ -15,16 +15,23 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.RendererCapabilities;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.ui.TrackNameProvider;
+import com.google.android.exoplayer2.ui.DefaultTrackNameProvider;
+import com.google.android.exoplayer2.source.TrackGroup;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -33,6 +40,7 @@ import com.google.android.exoplayer2.util.Util;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,10 +59,12 @@ final class VideoPlayer {
   private final TextureRegistry.SurfaceTextureEntry textureEntry;
 
   private QueuingEventSink eventSink = new QueuingEventSink();
+  DefaultTrackSelector trackSelector ;
 
   private final EventChannel eventChannel;
 
   private boolean isInitialized = false;
+  Context context;
 
   VideoPlayer(
       Context context,
@@ -63,9 +73,11 @@ final class VideoPlayer {
       String dataSource,
       String formatHint) {
     this.eventChannel = eventChannel;
+    this.context = context;
+
     this.textureEntry = textureEntry;
 
-    TrackSelector trackSelector = new DefaultTrackSelector();
+    trackSelector = new DefaultTrackSelector();
     exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
 
     Uri uri = Uri.parse(dataSource);
@@ -227,6 +239,75 @@ final class VideoPlayer {
   void setVolume(double value) {
     float bracketedValue = (float) Math.max(0.0, Math.min(1.0, value));
     exoPlayer.setVolume(bracketedValue);
+  }
+  ArrayList getAudios() {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
+
+    ArrayList audios = new ArrayList();
+
+    for(int i =0;i<mappedTrackInfo.getRendererCount();i++)
+    {
+      if(mappedTrackInfo.getRendererType(i)!= C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for(int j =0;j<trackGroupArray.length;j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+          if ((mappedTrackInfo.getTrackSupport(i, j, k) &0b111)
+                  == RendererCapabilities.FORMAT_HANDLED) {
+            //trackSelector.setParameters(builder);
+            audios.add(provider.getTrackName(group.getFormat(k)));
+
+
+          }
+
+        }
+      }
+
+    }
+    return audios;
+
+
+  }
+  void setAudio( String audioName) {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
+
+    StringBuilder str = new StringBuilder();
+
+    for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+      if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for (int j = 0; j < trackGroupArray.length; j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+
+          if (provider.getTrackName(group.getFormat(k)).equals(audioName)) {
+
+            DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+            builder.clearSelectionOverrides(i).setRendererDisabled(i, false);
+            int[] tracks = {k};
+            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(j, tracks);
+            builder.setSelectionOverride(i, mappedTrackInfo.getTrackGroups(i), override);
+            trackSelector.setParameters(builder);
+            return ;
+
+
+
+          }
+
+        }
+      }
+
+    }
   }
 
   void seekTo(int location) {

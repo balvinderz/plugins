@@ -1,9 +1,14 @@
-import 'package:pigeon/pigeon_lib.dart';
+  import 'package:pigeon/pigeon_lib.dart';
 
 class TextureMessage {
   int textureId;
 }
+class AudioMessage
+{
+  int textureId;
+  List audios;
 
+}
 class LoopingMessage {
   int textureId;
   bool isLooping;
@@ -36,6 +41,9 @@ abstract class VideoPlayerApi {
   void play(TextureMessage msg);
   PositionMessage position(TextureMessage msg);
   void seekTo(PositionMessage msg);
+  void setAudio(AudioMessage msg);
+  AudioMessage getAudios(TextureMessage msg);
+
   void pause(TextureMessage msg);
 }
 

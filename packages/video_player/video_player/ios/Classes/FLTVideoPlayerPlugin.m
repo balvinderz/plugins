@@ -559,5 +559,46 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
   FLTVideoPlayer* player = _players[input.textureId];
   [player pause];
 }
+- (FLTAudioMessage*)getAudios:(FLTTextureMessage*)input error:(FlutterError**)error{
+    
+  FLTAudioMessage* result = [[FLTAudioMessage alloc] init];
+  FLTVideoPlayer* player = _players[input.textureId];
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+
+    NSArray* x = audioSelectionGroup.options;
+    NSMutableArray* audios;
+    audios = [NSMutableArray array];
+
+    for(AVMediaSelectionOption* object in x)
+    {
+
+        [audios addObject: object.displayName];
+        //result.audioTypes =[NSString stringWithFormat: @"%@%@%@", result.audioTypes, object.extendedLanguageTag,@"\n"];
+    }
+    NSArray *array = [audios copy];
+    result.audios = array;
+
+
+  return result;
+
+}
+- (void)setAudio:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
+    FLTVideoPlayer* player = _players[input.textureId];
+    NSString* audioType = input.audios.firstObject;
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+    NSArray* x = audioSelectionGroup.options;
+    for(AVMediaSelectionOption* object in x)
+    {
+        
+        if([object.displayName isEqualToString:audioType] ==1)
+            [[player.player currentItem] selectMediaOption:object inMediaSelectionGroup: audioSelectionGroup];
+            
+
+
+        
+        
+        
+    }
+}
 
 @end

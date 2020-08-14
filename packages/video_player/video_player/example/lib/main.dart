@@ -23,7 +23,7 @@ class _App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         key: const ValueKey<String>('home_page'),
         appBar: AppBar(
@@ -45,20 +45,26 @@ class _App extends StatelessWidget {
           bottom: const TabBar(
             isScrollable: true,
             tabs: <Widget>[
+
               Tab(
                 icon: Icon(Icons.cloud),
                 text: "Remote",
               ),
               Tab(icon: Icon(Icons.insert_drive_file), text: "Asset"),
               Tab(icon: Icon(Icons.list), text: "List example"),
+              Tab(icon: Icon(Icons.audiotrack),text: "Change Audio",),
+
             ],
           ),
         ),
         body: TabBarView(
           children: <Widget>[
+
             _BumbleBeeRemoteVideo(),
             _ButterFlyAssetVideo(),
             _ButterFlyAssetVideoInList(),
+            ChangeAudio(),
+
           ],
         ),
       ),
@@ -237,6 +243,7 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
 
   @override
   Widget build(BuildContext context) {
+
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
@@ -353,5 +360,104 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
         ),
       ),
     );
+  }
+}
+
+class ChangeAudio extends StatefulWidget {
+  @override
+  _ChangeAudioVideoState createState() => _ChangeAudioVideoState();
+}
+
+class _ChangeAudioVideoState extends State<ChangeAudio> {
+  VideoPlayerController _controller;
+
+  List types=[];
+
+  Future<ClosedCaptionFile> _loadCaptions() async {
+    final String fileContents = await DefaultAssetBundle.of(context)
+        .loadString('assets/bumble_bee_captions.srt');
+    return SubRipCaptionFile(fileContents);
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(
+      "http://cdn.theoplayer.com/video/elephants-dream/playlist.m3u8",
+      //closedCaptionFile: _loadCaptions(),
+    );
+
+    _controller.addListener(() {
+      setState(() {});
+    });
+    _controller.setLooping(true);
+    myAsyncMethod();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Container(padding: const EdgeInsets.only(top: 20.0)),
+          const Text('With remote mp4'),
+          Column(
+            children: getWidgets(),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: <Widget>[
+                  VideoPlayer(_controller),
+                  ClosedCaption(text: _controller.value.caption.text),
+                  _PlayPauseOverlay(controller: _controller),
+                  VideoProgressIndicator(_controller, allowScrubbing: true),
+                ],
+              ),
+            ),
+
+          ),
+
+
+        ],
+      ),
+    );
+  }
+
+  Future<void> myAsyncMethod() async {
+    await _controller.initialize();
+  types = (await  _controller.getAudios());
+
+
+  setState(() {
+
+  });
+  return ;
+
+  }
+  List<Widget> getWidgets(){
+
+    List<Widget> widgets = [];
+    for(int i =0;i<types.length;i++) {
+      widgets.add(ListTile(title : Text(types[i]),onTap: (){
+        _controller.setAudio(types[i]);
+
+      },));
+    }
+
+
+    return widgets;
+
   }
 }
