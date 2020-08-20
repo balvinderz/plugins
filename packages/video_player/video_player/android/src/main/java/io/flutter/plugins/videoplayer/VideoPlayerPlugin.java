@@ -148,7 +148,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   public void setAudioByIndex(AudioMessage arg)
   {
     VideoPlayer player = videoPlayers.get(arg.getTextureId());
-    player.setAudioByIndex(arg.getIndex().intValue);
+    player.setAudioByIndex(arg.getIndex().intValue());
 
   }
   public void dispose(TextureMessage arg) {
