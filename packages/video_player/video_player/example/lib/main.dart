@@ -451,7 +451,7 @@ class _ChangeAudioVideoState extends State<ChangeAudio> {
     List<Widget> widgets = [];
     for(int i =0;i<types.length;i++) {
       widgets.add(ListTile(title : Text(types[i]),onTap: (){
-        _controller.setAudio(types[i]);
+        _controller.setAudioByIndex(i);
 
       },));
     }

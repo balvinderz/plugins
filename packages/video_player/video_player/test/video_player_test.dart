@@ -52,6 +52,24 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
 
   @override
   Future<ClosedCaptionFile> get closedCaptionFile => _loadClosedCaption();
+
+  @override
+  Future<List> getAudios() {
+    // TODO: implement getAudios
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setAudio(String audio) {
+    // TODO: implement setAudio
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setAudioByIndex(int index) {
+    // TODO: implement setAudioByIndex
+    throw UnimplementedError();
+  }
 }
 
 Future<ClosedCaptionFile> _loadClosedCaption() async =>

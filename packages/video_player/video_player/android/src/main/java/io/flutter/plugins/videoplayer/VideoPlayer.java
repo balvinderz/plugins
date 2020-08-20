@@ -309,7 +309,45 @@ final class VideoPlayer {
 
     }
   }
+  void setAudioByIndex( int  index) {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
 
+    StringBuilder str = new StringBuilder();
+    int audioIndex =0;
+
+    for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+      if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for (int j = 0; j < trackGroupArray.length; j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+
+          if (audioIndex == index) {
+
+            DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+            builder.clearSelectionOverrides(i).setRendererDisabled(i, false);
+            int[] tracks = {k};
+            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(j, tracks);
+            builder.setSelectionOverride(i, mappedTrackInfo.getTrackGroups(i), override);
+            trackSelector.setParameters(builder);
+            return ;
+
+
+
+          }
+          audioIndex++;
+
+
+        }
+      }
+
+    }
+  }
   void seekTo(int location) {
     exoPlayer.seekTo(location);
   }

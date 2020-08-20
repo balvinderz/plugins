@@ -160,10 +160,15 @@ public class Messages {
     public ArrayList getAudios() { return audios; }
     public void setAudios(ArrayList setterArg) { this.audios = setterArg; }
 
+    private Long index;
+    public Long getIndex() { return index; }
+    public void setIndex(Long setterArg) { this.index = setterArg; }
+
     HashMap toMap() {
       HashMap<String, Object> toMapResult = new HashMap<>();
       toMapResult.put("textureId", textureId);
       toMapResult.put("audios", audios);
+      toMapResult.put("index", index);
       return toMapResult;
     }
     static AudioMessage fromMap(HashMap map) {
@@ -172,6 +177,8 @@ public class Messages {
       fromMapResult.textureId = (textureId == null) ? null : ((textureId instanceof Integer) ? (Integer)textureId : (Long)textureId);
       Object audios = map.get("audios");
       fromMapResult.audios = (ArrayList)audios;
+      Object index = map.get("index");
+      fromMapResult.index = (index == null) ? null : ((index instanceof Integer) ? (Integer)index : (Long)index);
       return fromMapResult;
     }
   }
@@ -187,6 +194,7 @@ public class Messages {
     PositionMessage position(TextureMessage arg);
     void seekTo(PositionMessage arg);
     void setAudio(AudioMessage arg);
+    void setAudioByIndex(AudioMessage arg);
     AudioMessage getAudios(TextureMessage arg);
     void pause(TextureMessage arg);
 
@@ -368,6 +376,27 @@ public class Messages {
               @SuppressWarnings("ConstantConditions")
               AudioMessage input = AudioMessage.fromMap((HashMap)message);
               api.setAudio(input);
+              wrapped.put("result", null);
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.VideoPlayerApi.setAudioByIndex", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              AudioMessage input = AudioMessage.fromMap((HashMap)message);
+              api.setAudioByIndex(input);
               wrapped.put("result", null);
             }
             catch (Exception exception) {

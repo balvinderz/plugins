@@ -354,6 +354,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     return _videoPlayerPlatform.getAudios(_textureId);
 
   }
+  Future<void> setAudioByIndex(int index) async{
+    return _videoPlayerPlatform.setAudioByIndex(_textureId,index);
+
+  }
   Future<void> setAudio(String audio) async
   {
 

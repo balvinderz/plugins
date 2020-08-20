@@ -582,6 +582,26 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
   return result;
 
 }
+- (void)setAudioByIndex:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
+    FLTVideoPlayer* player = _players[input.textureId];
+    int index = [input.index intValue];
+    int i =0;
+
+    AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+    NSArray* x = audioSelectionGroup.options;
+
+    for(AVMediaSelectionOption* object in x)
+    {
+
+        if(index == i)
+        {
+            [[player.player currentItem] selectMediaOption:object inMediaSelectionGroup: audioSelectionGroup];
+            break;
+
+            }
+        i+=1;
+    }
+}
 - (void)setAudio:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
     FLTVideoPlayer* player = _players[input.textureId];
     NSString* audioType = input.audios.firstObject;

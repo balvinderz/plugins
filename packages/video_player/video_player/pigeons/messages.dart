@@ -7,6 +7,8 @@ class AudioMessage
 {
   int textureId;
   List audios;
+  int index;
+
 
 }
 class LoopingMessage {
@@ -42,6 +44,8 @@ abstract class VideoPlayerApi {
   PositionMessage position(TextureMessage msg);
   void seekTo(PositionMessage msg);
   void setAudio(AudioMessage msg);
+  void setAudioByIndex(AudioMessage msg);
+
   AudioMessage getAudios(TextureMessage msg);
 
   void pause(TextureMessage msg);

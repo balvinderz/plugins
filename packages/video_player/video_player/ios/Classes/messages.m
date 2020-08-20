@@ -152,10 +152,14 @@ static NSDictionary* wrapResult(NSDictionary *result, FlutterError *error) {
   if ((NSNull *)result.audios == [NSNull null]) {
     result.audios = nil;
   }
+  result.index = dict[@"index"];
+  if ((NSNull *)result.index == [NSNull null]) {
+    result.index = nil;
+  }
   return result;
 }
 -(NSDictionary*)toMap {
-  return [NSDictionary dictionaryWithObjectsAndKeys:(self.textureId ? self.textureId : [NSNull null]), @"textureId", (self.audios ? self.audios : [NSNull null]), @"audios", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.textureId ? self.textureId : [NSNull null]), @"textureId", (self.audios ? self.audios : [NSNull null]), @"audios", (self.index ? self.index : [NSNull null]), @"index", nil];
 }
 @end
 
@@ -305,6 +309,23 @@ void FLTVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMessenger, id<FLTVi
         FlutterError *error;
         FLTAudioMessage *input = [FLTAudioMessage fromMap:message];
         [api setAudio:input error:&error];
+        callback(wrapResult(nil, error));
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.VideoPlayerApi.setAudioByIndex"
+        binaryMessenger:binaryMessenger];
+    if (api) {
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        FlutterError *error;
+        FLTAudioMessage *input = [FLTAudioMessage fromMap:message];
+        [api setAudioByIndex:input error:&error];
         callback(wrapResult(nil, error));
       }];
     }
