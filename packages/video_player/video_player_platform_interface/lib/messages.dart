@@ -120,11 +120,13 @@ class PositionMessage {
 class AudioMessage {
   int textureId;
   List audios;
+  int index;
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
     pigeonMap['textureId'] = textureId;
     pigeonMap['audios'] = audios;
+    pigeonMap['index'] = index;
     return pigeonMap;
   }
   // ignore: unused_element
@@ -135,6 +137,7 @@ class AudioMessage {
     final AudioMessage result = AudioMessage();
     result.textureId = pigeonMap['textureId'];
     result.audios = pigeonMap['audios'];
+    result.index = pigeonMap['index'];
     return result;
   }
 }
@@ -319,6 +322,28 @@ class VideoPlayerApi {
     final Map<dynamic, dynamic> requestMap = arg._toMap();
     const BasicMessageChannel<dynamic> channel =
         BasicMessageChannel<dynamic>('dev.flutter.pigeon.VideoPlayerApi.setAudio', StandardMessageCodec());
+    
+    final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null);
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'];
+      throw PlatformException(
+          code: error['code'],
+          message: error['message'],
+          details: error['details']);
+    } else {
+      // noop
+    }
+    
+  }
+  Future<void> setAudioByIndex(AudioMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+        BasicMessageChannel<dynamic>('dev.flutter.pigeon.VideoPlayerApi.setAudioByIndex', StandardMessageCodec());
     
     final Map<dynamic, dynamic> replyMap = await channel.send(requestMap);
     if (replyMap == null) {

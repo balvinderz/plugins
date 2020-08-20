@@ -60,18 +60,23 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
   }
   @override
   Future<List> getAudios(int textureId) async {
-    // TODO: implement getAudios
     AudioMessage audioMessage = await  _api.getAudios(TextureMessage()..textureId =textureId);
     return audioMessage.audios;
 
   }
   @override
   Future<void> setAudio(int textureId, List audio) {
-    // TODO: implement setAudio
     return _api.setAudio(AudioMessage()..textureId = textureId
     ..audios = audio
     );
     
+  }
+  @override
+  Future<void> setAudioByIndex(int textureId, int index) {
+    return _api.setAudioByIndex(AudioMessage()..textureId = textureId
+      ..index = index
+    );
+
   }
   @override
   Future<void> pause(int textureId) {

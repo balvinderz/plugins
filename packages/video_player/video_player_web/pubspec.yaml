@@ -24,6 +24,7 @@ dependencies:
       url: https://github.com/balvinderz/plugins
       ref: features/change_audio
       path: packages/video_player/video_player_platform_interface
+
   js: any
 dev_dependencies:
   flutter_test:

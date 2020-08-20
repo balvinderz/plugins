@@ -90,9 +90,15 @@ abstract class VideoPlayerPlatform {
     throw UnimplementedError('getAudios() has not been implemented');
 
   }
+  /// Set audio by audio name
   Future<void> setAudio(int textureId,List audio)
   {
     throw UnimplementedError('setAudio() has not been implemented');
+
+  }
+  /// Set audio by index
+  Future<void> setAudioByIndex(int textureId, int index) {
+    throw UnimplementedError("setAudioByIndex() has not been implemented");
 
   }
 
@@ -128,6 +134,8 @@ abstract class VideoPlayerPlatform {
   // This private method is called by the instance setter, which fails if the class is
   // implemented with `implements`.
   void _verifyProvidesDefaultImplementations() {}
+
+
 }
 
 /// Description of the data source used to create an instance of
