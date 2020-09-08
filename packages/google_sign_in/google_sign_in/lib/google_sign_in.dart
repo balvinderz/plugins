@@ -14,6 +14,8 @@ export 'package:google_sign_in_platform_interface/google_sign_in_platform_interf
     show SignInOption;
 export 'src/common.dart';
 export 'widgets.dart';
+export 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart' show UxMode;
+
 
 /// Holds authentication tokens after sign in.
 class GoogleSignInAuthentication {
@@ -150,6 +152,8 @@ class GoogleSignInAccount implements GoogleIdentity {
 
 /// GoogleSignIn allows you to authenticate Google users.
 class GoogleSignIn {
+  String redirectUri;
+
   /// Initializes global sign-in configuration settings.
   ///
   /// The [signInOption] determines the user experience. [SigninOption.games]
@@ -169,6 +173,8 @@ class GoogleSignIn {
     this.scopes = const <String>[],
     this.hostedDomain,
     this.clientId,
+    this.uxMode,
+    this.redirectUri
   });
 
   /// Factory for creating default sign in user experience.
@@ -216,6 +222,7 @@ class GoogleSignIn {
 
   /// Client ID being used to connect to google sign-in. Only supported on web.
   final String clientId;
+  final UxMode uxMode;
 
   StreamController<GoogleSignInAccount> _currentUserController =
       StreamController<GoogleSignInAccount>.broadcast();
@@ -251,6 +258,8 @@ class GoogleSignIn {
       scopes: scopes,
       hostedDomain: hostedDomain,
       clientId: clientId,
+      redirectUri: redirectUri,
+      uxMode: uxMode
     )..catchError((dynamic _) {
         // Invalidate initialization if it errors out.
         _initialization = null;

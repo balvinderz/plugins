@@ -12,7 +12,8 @@ import 'generated/gapiauth2.dart' as auth2;
 /// Injects a bunch of libraries in the <head> and returns a
 /// Future that resolves when all load.
 Future<void> injectJSLibraries(List<String> libraries,
-    {html.HtmlElement target /*, Duration timeout */}) {
+    {html.HtmlElement target /*, Duration timeout */
+    }) {
   final List<Future<void>> loading = <Future<void>>[];
   final List<html.HtmlElement> tags = <html.HtmlElement>[];
 
@@ -43,6 +44,8 @@ GoogleSignInUserData gapiUserToPluginUserData(auth2.GoogleUser currentUser) {
     email: profile?.getEmail(),
     id: profile?.getId(),
     photoUrl: profile?.getImageUrl(),
-    idToken: currentUser.getAuthResponse()?.id_token,
+    idToken: currentUser
+        .getAuthResponse()
+        ?.id_token,
   );
 }

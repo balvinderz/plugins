@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required, visibleForTesting;
 import 'src/method_channel_google_sign_in.dart';
 import 'src/types.dart';
-
 export 'src/method_channel_google_sign_in.dart';
 export 'src/types.dart';
 
@@ -82,7 +81,10 @@ abstract class GoogleSignInPlatform {
       {@required String hostedDomain,
       List<String> scopes,
       SignInOption signInOption,
-      String clientId}) async {
+      String clientId,
+      UxMode uxMode,
+        String redirectUri
+      }) async {
     throw UnimplementedError('init() has not been implemented.');
   }
 
@@ -129,4 +131,8 @@ abstract class GoogleSignInPlatform {
   Future<bool> requestScopes(List<String> scopes) async {
     throw UnimplementedError('requestScopes() has not been implmented.');
   }
+}
+enum UxMode {
+  popup,
+  redirect
 }

@@ -15,7 +15,10 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: <String>[
     'email',
     'https://www.googleapis.com/auth/contacts.readonly',
+
   ],
+  uxMode: UxMode.popup,
+  redirectUri: "http://localhost:5000/"
 );
 
 void main() {

@@ -70,7 +70,10 @@ class GoogleSignInPlugin extends GoogleSignInPlatform {
       {@required String hostedDomain,
       List<String> scopes = const <String>[],
       SignInOption signInOption = SignInOption.standard,
-      String clientId}) async {
+      String clientId,
+        UxMode uxMode,
+        String redirectUri,
+      }) async {
     final String appClientId = clientId ?? _autoDetectedClientId;
     assert(
         appClientId != null,
@@ -91,6 +94,8 @@ class GoogleSignInPlugin extends GoogleSignInPlatform {
       // The js lib wants a space-separated list of values
       scope: scopes.join(' '),
       client_id: appClientId,
+      ux_mode: (uxMode !=null) ? (uxMode == UxMode.popup ? "popup" : "redirect") : "popup",
+      redirect_uri: redirectUri
     ));
 
     Completer<void> isAuthInitialized = Completer<void>();

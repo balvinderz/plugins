@@ -10,7 +10,6 @@ import 'package:meta/meta.dart' show required, visibleForTesting;
 import '../google_sign_in_platform_interface.dart';
 import 'types.dart';
 import 'utils.dart';
-
 /// An implementation of [GoogleSignInPlatform] that uses method channels.
 class MethodChannelGoogleSignIn extends GoogleSignInPlatform {
   /// This is only exposed for test purposes. It shouldn't be used by clients of
@@ -24,7 +23,7 @@ class MethodChannelGoogleSignIn extends GoogleSignInPlatform {
       {@required String hostedDomain,
       List<String> scopes = const <String>[],
       SignInOption signInOption = SignInOption.standard,
-      String clientId}) {
+      String clientId,UxMode uxMode,String redirectUri}) {
     return channel.invokeMethod<void>('init', <String, dynamic>{
       'signInOption': signInOption.toString(),
       'scopes': scopes,
