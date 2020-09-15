@@ -17,12 +17,18 @@ flutter:
         pluginClass: FLTPackageInfoPlugin
       macos:
         pluginClass: FLTPackageInfoPlugin
+      web:
+        default_package: package_info_web
 
 dependencies:
   flutter:
     sdk: flutter
+  package_info_web:
+    path: ../package_info_web
 
 dev_dependencies:
+  flutter_web_plugins:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   flutter_driver:
