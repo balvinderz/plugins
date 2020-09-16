@@ -6,8 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:http/http.dart';
 
-// ignore: public_member_api_docs
+///Web Implementation of PackageInfo
 class PackageInfoPlugin {
+  ///Register with Registrar
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
         'plugins.flutter.io/package_info',
@@ -17,6 +18,7 @@ class PackageInfoPlugin {
     channel.setMethodCallHandler(instance.handleMethodCall);
   }
 
+  ///Handle method call
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'getAll':
@@ -36,16 +38,19 @@ class PackageInfoPlugin {
         ":" +
         window.location.port +
         "/version.json";
-    print(url);
 
     final response = await get(url);
     if (response.statusCode == 200) {
-      final versionMap = jsonDecode(response.body);
-      return {
-        "appName": versionMap['app_name'],
-        "version": versionMap['version'],
-        "buildNumber": versionMap['build_number']
-      };
+      try {
+        final versionMap = jsonDecode(response.body);
+        return {
+          "appName": versionMap['app_name'],
+          "version": versionMap['version'],
+          "buildNumber": versionMap['build_number']
+        };
+      } catch (e) {
+        return {};
+      }
     } else {
       return {};
     }
