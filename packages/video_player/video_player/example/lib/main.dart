@@ -213,12 +213,13 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
         .loadString('assets/bumble_bee_captions.srt');
     return SubRipCaptionFile(fileContents);
   }
+  bool fullScreen = false;
 
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+      'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4',
       closedCaptionFile: _loadCaptions(),
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
@@ -242,7 +243,17 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
       child: Column(
         children: <Widget>[
           Container(padding: const EdgeInsets.only(top: 20.0)),
-          const Text('With remote mp4'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('With remote mp4'),
+              IconButton(icon: Icon(Icons.fullscreen), onPressed: () async {
+                fullScreen=!fullScreen;
+                await  _controller.setFullScreen(!fullScreen);
+
+              })
+            ],
+          ),
           Container(
             padding: const EdgeInsets.all(20),
             child: AspectRatio(

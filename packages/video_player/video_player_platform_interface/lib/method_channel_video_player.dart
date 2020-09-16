@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'messages.dart';
+import 'messages.dart';
 import 'video_player_platform_interface.dart';
 
 /// An implementation of [VideoPlayerPlatform] that uses method channels.
@@ -70,7 +71,12 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
       ..textureId = textureId
       ..volume = volume);
   }
+  @override
+  Future<void> setFullScreen(int textureId, bool fullScreen) {
+    // TODO: implement setFullScreen
+    return _api.setFullScreen(FullScreenMessage()..textureId = textureId..fullscreen = fullScreen);
 
+  }
   @override
   Future<void> seekTo(int textureId, Duration position) {
     return _api.seekTo(PositionMessage()

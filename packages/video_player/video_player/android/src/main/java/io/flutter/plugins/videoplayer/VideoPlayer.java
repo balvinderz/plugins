@@ -3,10 +3,19 @@ package io.flutter.plugins.videoplayer;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_ALL;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Build;
+import android.view.LayoutInflater;
 import android.view.Surface;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -57,6 +66,7 @@ final class VideoPlayer {
   private boolean isInitialized = false;
 
   private final VideoPlayerOptions options;
+  private  final Context context;
 
   VideoPlayer(
       Context context,
@@ -68,6 +78,7 @@ final class VideoPlayer {
     this.eventChannel = eventChannel;
     this.textureEntry = textureEntry;
     this.options = options;
+    this.context = context;
 
     TrackSelector trackSelector = new DefaultTrackSelector();
     exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
@@ -166,6 +177,7 @@ final class VideoPlayer {
         });
 
     surface = new Surface(textureEntry.surfaceTexture());
+    //exoPlayer.setVideoSurfaceView(new SurfaceView(context));
     exoPlayer.setVideoSurface(surface);
     setAudioAttributes(exoPlayer, options.mixWithOthers);
 
@@ -232,7 +244,11 @@ final class VideoPlayer {
     float bracketedValue = (float) Math.max(0.0, Math.min(1.0, value));
     exoPlayer.setVolume(bracketedValue);
   }
-
+  void setFullScreen(boolean fullScreen)
+  {
+    LayoutInflater.from(context).
+    ((Activity) context).get
+  }
   void seekTo(int location) {
     exoPlayer.seekTo(location);
   }

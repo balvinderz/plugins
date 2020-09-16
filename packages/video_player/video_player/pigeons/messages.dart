@@ -13,7 +13,11 @@ class VolumeMessage {
   int textureId;
   double volume;
 }
+class FullScreenMessage{
+  int textureId;
+  bool fullscreen;
 
+}
 class PositionMessage {
   int textureId;
   int position;
@@ -42,6 +46,7 @@ abstract class VideoPlayerApi {
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
+  void setFullScreen(FullScreenMessage msg);
 }
 
 void configurePigeon(PigeonOptions opts) {

@@ -94,7 +94,12 @@ abstract class VideoPlayerPlatform {
   Future<void> setVolume(int textureId, double volume) {
     throw UnimplementedError('setVolume() has not been implemented.');
   }
+  /// Set the player to full screen or non fullscreen mode
+  Future<void> setFullScreen(int textureId,bool fullScreen)
+  {
+    throw UnimplementedError('setFullScreen() has not been implemented.');
 
+  }
   /// Sets the video position to a [Duration] from the start.
   Future<void> seekTo(int textureId, Duration position) {
     throw UnimplementedError('seekTo() has not been implemented.');

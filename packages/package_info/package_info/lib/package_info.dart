@@ -4,10 +4,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-
-const MethodChannel _kChannel =
-    MethodChannel('plugins.flutter.io/package_info');
+import 'package:package_info_platform_interface/package_info_platform_interface.dart';
 
 /// Application metadata. Provides application bundle information on iOS and
 /// application package information on Android.
@@ -40,7 +37,8 @@ class PackageInfo {
     }
 
     final Map<String, dynamic> map =
-        await _kChannel.invokeMapMethod<String, dynamic>('getAll');
+        await PackageInfoPlatform.instance.getAll();
+
     _fromPlatform = PackageInfo(
       appName: map["appName"],
       packageName: map["packageName"],

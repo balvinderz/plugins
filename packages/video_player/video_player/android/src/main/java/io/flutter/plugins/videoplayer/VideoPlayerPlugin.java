@@ -175,6 +175,12 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   }
 
   @Override
+  public void setFullScreen(Messages.FullScreenMessage arg) {
+    VideoPlayer player = videoPlayers.get(arg.getTextureId());
+    player.setFullScreen(arg.getFullscreen());
+  }
+
+  @Override
   public void setMixWithOthers(MixWithOthersMessage arg) {
     options.mixWithOthers = arg.getMixWithOthers();
   }

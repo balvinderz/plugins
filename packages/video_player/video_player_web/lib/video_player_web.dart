@@ -54,7 +54,11 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
     _videoPlayers.remove(textureId);
     return null;
   }
+  @override
+  Future<void> setMixWithOthers(bool mixWithOthers) async {
+    return ;
 
+  }
   void _disposeAllPlayers() {
     _videoPlayers.values
         .forEach((_VideoPlayer videoPlayer) => videoPlayer.dispose());
@@ -113,7 +117,11 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
   Future<void> pause(int textureId) async {
     return _videoPlayers[textureId].pause();
   }
+  @override
+  Future<void> setFullScreen(int textureId, bool fullScreen) async  {
+    return _videoPlayers[textureId].setFullscreen(fullScreen);
 
+  }
   @override
   Future<void> setVolume(int textureId, double volume) async {
     return _videoPlayers[textureId].setVolume(volume);
@@ -239,7 +247,6 @@ class _VideoPlayer {
   Duration getPosition() {
     return Duration(milliseconds: (videoElement.currentTime * 1000).round());
   }
-
   void sendInitialized() {
     eventController.add(
       VideoEvent(
@@ -269,5 +276,13 @@ class _VideoPlayer {
       ));
     }
     return durationRange;
+  }
+
+  void setFullscreen(bool fullScreen) {
+    if(fullScreen) {
+      videoElement.enterFullscreen();
+    } else {
+      videoElement.exitFullscreen();
+    }
   }
 }

@@ -106,7 +106,6 @@ class VideoPlayerValue {
     }
     return aspectRatio;
   }
-
   /// Returns a new instance that has the same values as this current instance,
   /// except for any overrides passed in as arguments to [copyWidth].
   VideoPlayerValue copyWith({
@@ -357,7 +356,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     value = value.copyWith(isPlaying: true);
     await _applyPlayPause();
   }
+  /// This method is used to go fullscreen or out of fullscreen
+  Future<void> setFullScreen(bool fullScreen)async{
+    await _videoPlayerPlatform.setFullScreen(_textureId, fullScreen);
 
+  }
   /// Sets whether or not the video should loop after playing once. See also
   /// [VideoPlayerValue.isLooping].
   Future<void> setLooping(bool looping) async {
