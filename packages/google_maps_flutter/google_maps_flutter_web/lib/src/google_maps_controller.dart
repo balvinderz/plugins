@@ -58,6 +58,7 @@ class GoogleMapController {
   PolygonsController _polygonsController;
   PolylinesController _polylinesController;
   MarkersController _markersController;
+
   // Keeps track if _attachGeometryControllers has been called or not.
   bool _controllersBoundToMap = false;
 
@@ -139,6 +140,9 @@ class GoogleMapController {
     );
 
     _setTrafficLayer(_googleMap, _isTrafficLayerEnabled(_rawOptions));
+    _setMyLocation(_googleMap, _isMyLocationEnabled(_rawOptions));
+    _setMyLocationButtonEnabled(_googleMap,_isMyLocationButtonEnabled(_rawOptions));
+
   }
 
   // Funnels map gmap events into the plugin's stream controller.
@@ -325,5 +329,80 @@ class GoogleMapController {
     _polylinesController = null;
     _markersController = null;
     _streamController.close();
+  }
+
+  _isMyLocationEnabled(Map<String, dynamic> rawOptions) {
+    if (rawOptions['options'] == null) {
+      return false;
+    }
+    return rawOptions['options']['myLocationEnabled'] ?? false;
+  }
+
+  Future<void> _setMyLocation(
+      gmaps.GMap googleMap, isMyLocationEnabled) async {
+    if(isMyLocationEnabled) {
+      try {
+       Geoposition geoPosition = await  window.navigator.geolocation.getCurrentPosition(timeout: Duration(seconds: 10));
+       print(geoPosition.coords.longitude);
+
+       LatLng latLng = LatLng(geoPosition.coords.latitude,geoPosition.coords.longitude);
+
+       await  moveCamera(CameraUpdate.newLatLng(latLng));
+
+      }catch(e)
+    {
+      print(e.toString());
+
+      print("User denied permission");
+
+    }
+    } else {
+      print("not enabled");
+    }
+
+  }
+
+  _isMyLocationButtonEnabled(Map<String, dynamic> rawOptions) {
+    if (rawOptions['options'] == null) {
+      return false;
+    }
+    return rawOptions['options']['myLocationButtonEnabled'] ?? false;
+  }
+
+  void _setMyLocationButtonEnabled(gmaps.GMap googleMap, isMyLocationButtonEnabled) {
+   // _googleMap.controls[ControlPosition.TOP_RIGHT].push(Eleme)
+    DivElement myLocationButton = DivElement();
+    var firstChild =  ButtonElement();
+
+    firstChild.style.backgroundColor = '#fff';
+    firstChild.style.border = 'none';
+    firstChild.style.outline = 'none';
+    firstChild.style.width = '28px';
+    firstChild.style.height = '28px';
+    firstChild.style.borderRadius = '2px';
+    firstChild.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    firstChild.style.cursor = 'pointer';
+    firstChild.style.marginRight = '10px';
+    firstChild.style.padding = '0px';
+    firstChild.title = 'Your Location';
+
+    var secondChild = DivElement();
+    secondChild.style.margin = '5px';
+    secondChild.style.width = '18px';
+    secondChild.style.height = '18px';
+    secondChild.style.backgroundImage = 'url(https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-1x.png)';
+    secondChild.style.backgroundSize = '180px 18px';
+    secondChild.style.backgroundPosition = '0px 0px';
+    secondChild.style.backgroundRepeat = 'no-repeat';
+    secondChild.id = 'you_location_img';
+    firstChild.append(secondChild);
+    myLocationButton.append(firstChild);
+
+    myLocationButton.addEventListener("click", (event) {
+    myLocationButton
+
+    });
+
+    _googleMap.controls[gmaps.ControlPosition.TOP_RIGHT].push(myLocationButton);
   }
 }
