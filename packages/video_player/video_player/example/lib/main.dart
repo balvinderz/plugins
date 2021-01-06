@@ -249,7 +249,9 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
               fontSize: 26
             ),),onTap: () async {
              await _controller.goFullScreen();
-              // await _controller.exitFullScreen();
+             await Future.delayed(Duration(seconds : 3));
+
+               await _controller.exitFullScreen();
 
 
             },),

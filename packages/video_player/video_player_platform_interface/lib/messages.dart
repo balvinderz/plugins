@@ -434,8 +434,8 @@ class VideoPlayerApi {
         'dev.flutter.pigeon.VideoPlayerApi.exitFullScreen',
         StandardMessageCodec());
     final Map<dynamic,dynamic> replyMap = await channel.send(requestMap) as Map<
-        Object,
-        Object>;
+        dynamic,
+        dynamic>;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',

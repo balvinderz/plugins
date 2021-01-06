@@ -6,7 +6,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <GLKit/GLKit.h>
 #import "messages.h"
-
+#import <AVKit/AVKit.h>
 #if !__has_feature(objc_arc)
 #error Code Requires ARC.
 #endif
@@ -452,10 +452,14 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 @property(readonly, strong, nonatomic) NSObject<FlutterPluginRegistrar>* registrar;
 @end
 
+UIViewController *viewController;
+
 @implementation FLTVideoPlayerPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FLTVideoPlayerPlugin* instance = [[FLTVideoPlayerPlugin alloc] initWithRegistrar:registrar];
   [registrar publish:instance];
+ viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+
   FLTVideoPlayerApiSetup(registrar.messenger, instance);
 }
 
@@ -587,6 +591,23 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 - (void)pause:(FLTTextureMessage*)input error:(FlutterError**)error {
   FLTVideoPlayer* player = _players[input.textureId];
   [player pause];
+}
+- (void)goFullScreen:(FLTTextureMessage*) input error:(FlutterError**)error{
+    FLTVideoPlayer* player = _players[input.textureId];
+    AVPlayerViewController* playerController = [AVPlayerViewController new];
+    
+    
+    playerController.player  = [player player];
+    [viewController presentViewController:playerController animated:true completion:^{
+        
+    }];
+    
+}
+- (void)exitFullScreen:(FLTTextureMessage*) input error:(FlutterError**)error{
+    
+    [[viewController presentingViewController] dismissViewControllerAnimated:false  completion:nil];
+    
+    
 }
 
 - (void)setMixWithOthers:(FLTMixWithOthersMessage*)input
