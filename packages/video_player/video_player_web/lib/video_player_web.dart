@@ -54,7 +54,6 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
     _videoPlayers.remove(textureId);
     return null;
   }
-
   void _disposeAllPlayers() {
     _videoPlayers.values
         .forEach((_VideoPlayer videoPlayer) => videoPlayer.dispose());
@@ -128,7 +127,20 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
   Future<void> seekTo(int textureId, Duration position) async {
     return _videoPlayers[textureId]!.seekTo(position);
   }
+  @override
+  Future<void> goFullScreen(int textureId) {
+    return _videoPlayers[textureId]!.goFullScreen();
+  }
+  @override
+  Future<void> exitFullScreen(int textureId) {
+    // TODO: implement exitFullScreen
+    return _videoPlayers[textureId]!.exitFullScreen();
 
+  }
+  @override
+  Future<void> setMixWithOthers(bool mixWithOthers)  async {
+    return ;
+  }
   @override
   Future<Duration> getPosition(int textureId) async {
     _videoPlayers[textureId]!.sendBufferingUpdate();
@@ -277,6 +289,11 @@ class _VideoPlayer {
     return Duration(milliseconds: (videoElement.currentTime * 1000).round());
   }
 
+  Future<void> setMixWithOthers(bool mixWithOthers) async {
+    return ;
+
+  }
+
   void sendInitialized() {
     eventController.add(
       VideoEvent(
@@ -307,4 +324,14 @@ class _VideoPlayer {
     }
     return durationRange;
   }
+
+  Future<void> goFullScreen() async{
+    videoElement.enterFullscreen();
+
+  }
+  Future<void> exitFullScreen() async{
+    videoElement.exitFullscreen();
+
+  }
+
 }
