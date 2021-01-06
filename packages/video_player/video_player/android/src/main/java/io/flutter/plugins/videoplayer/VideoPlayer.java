@@ -42,9 +42,9 @@ final class VideoPlayer {
   private static final String FORMAT_HLS = "hls";
   private static final String FORMAT_OTHER = "other";
 
-  private SimpleExoPlayer exoPlayer;
+  public SimpleExoPlayer exoPlayer;
 
-  private Surface surface;
+  public Surface surface;
 
   private final TextureRegistry.SurfaceTextureEntry textureEntry;
 

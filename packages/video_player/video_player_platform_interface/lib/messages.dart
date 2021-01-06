@@ -400,13 +400,14 @@ class VideoPlayerApi {
 
   Future<void> goFullScreen(TextureMessage arg) async {
     final Map<dynamic, dynamic> requestMap = arg._toMap();
+
     const BasicMessageChannel<dynamic> channel =
     BasicMessageChannel<dynamic>(
         'dev.flutter.pigeon.VideoPlayerApi.goFullScreen',
         StandardMessageCodec());
-    final Map<Object, Object> replyMap = await channel.send(requestMap) as Map<
-        Object,
-        Object>;
+    final Map<dynamic,dynamic> replyMap = await channel.send(requestMap) as Map<
+        dynamic,
+        dynamic>;
     if (replyMap == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -414,8 +415,8 @@ class VideoPlayerApi {
         details: null,
       );
     } else if (replyMap['error'] != null) {
-      final Map<Object, Object> error = replyMap['error'] as Map<Object,
-          Object>;
+      final Map<dynamic, dynamic> error = replyMap['error'] as Map<dynamic,
+          dynamic>;
       throw PlatformException(
         code: error['code'] as String,
         message: error['message'] as String,
@@ -432,7 +433,7 @@ class VideoPlayerApi {
     BasicMessageChannel<dynamic>(
         'dev.flutter.pigeon.VideoPlayerApi.exitFullScreen',
         StandardMessageCodec());
-    final Map<Object, Object> replyMap = await channel.send(requestMap) as Map<
+    final Map<dynamic,dynamic> replyMap = await channel.send(requestMap) as Map<
         Object,
         Object>;
     if (replyMap == null) {

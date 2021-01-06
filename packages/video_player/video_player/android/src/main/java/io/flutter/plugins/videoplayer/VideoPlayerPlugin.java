@@ -4,15 +4,30 @@
 
 package io.flutter.plugins.videoplayer;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.LongSparseArray;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
+
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import io.flutter.FlutterInjector;
 import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.*;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.videoplayer.Messages.CreateMessage;
 import io.flutter.plugins.videoplayer.Messages.LoopingMessage;
@@ -28,7 +43,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HttpsURLConnection;
 
 /** Android platform implementation of the VideoPlayerPlugin. */
-public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
+public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi,ActivityAware {
   private static final String TAG = "VideoPlayerPlugin";
   private final LongSparseArray<VideoPlayer> videoPlayers = new LongSparseArray<>();
   private FlutterState flutterState;
@@ -36,9 +51,11 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
 
   /** Register this with the v2 embedding for the plugin to respond to lifecycle callbacks. */
   public VideoPlayerPlugin() {}
+  Activity activity;
 
   @SuppressWarnings("deprecation")
   private VideoPlayerPlugin(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
+    
     this.flutterState =
         new FlutterState(
             registrar.context(),
@@ -46,9 +63,12 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
             registrar::lookupKeyForAsset,
             registrar::lookupKeyForAsset,
             registrar.textures());
+    this.activity = registrar.activity();
+
     flutterState.startListening(this, registrar.messenger());
   }
-
+  boolean isFullScreen ;
+  
   /** Registers this with the stable v1 embedding. Will not respond to lifecycle events. */
   @SuppressWarnings("deprecation")
   public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
@@ -59,7 +79,16 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
           return false; // We are not interested in assuming ownership of the NativeView.
         });
   }
+  @Override
+  public void onAttachedToActivity(ActivityPluginBinding binding)
+  {
+    this.activity = binding.getActivity();
 
+  }
+  @Override
+  public void onDetachedFromActivityForConfigChanges(){
+    
+  }
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
 
@@ -96,8 +125,17 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
     flutterState = null;
     initialize();
   }
+  @Override
+  public void onDetachedFromActivity(){
+    this.activity = null;
 
-  private void disposeAllPlayers() {
+
+  }
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+
+  }
+    private void disposeAllPlayers() {
     for (int i = 0; i < videoPlayers.size(); i++) {
       videoPlayers.valueAt(i).dispose();
     }
@@ -206,15 +244,57 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
   public void setMixWithOthers(MixWithOthersMessage arg) {
     options.mixWithOthers = arg.getMixWithOthers();
   }
+  int initial = 0;
+  PlayerView playerViewFullscreen;
 
-    @Override
+  @Override
     public void goFullScreen(TextureMessage arg) {
+      VideoPlayer player = videoPlayers.get(arg.getTextureId());
+//      PlayerView.switchTargetView(player,player);
+      playerViewFullscreen = new PlayerView(flutterState.applicationContext);
+      ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+      playerViewFullscreen.setLayoutParams(layoutParams);
+      //playerViewFullscreen.setVisibility(View.GONE);
+      playerViewFullscreen.setBackgroundColor(Color.BLACK);
+      View decorView =activity. getWindow().getDecorView();
+      initial = decorView.getSystemUiVisibility();
+      int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+      decorView.setSystemUiVisibility(uiOptions);
+      ImageView imageView = new ImageView(flutterState.applicationContext);
+      imageView.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.exo_controls_fullscreen_exit));
+      imageView.setMaxWidth(100);
+      imageView.setMaxHeight(100);
+      playerViewFullscreen.addView(imageView,new RelativeLayout.LayoutParams(100,100));
+      imageView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          exitFullScreen(arg);
+        }
+      });
+        activity.addContentView(playerViewFullscreen, layoutParams);
+      PlayerView.switchTargetView(player.exoPlayer,null,playerViewFullscreen);
+      isFullScreen = true;
+      
 
     }
 
     @Override
     public void exitFullScreen(TextureMessage arg) {
-
+    if(isFullScreen )
+    {
+      VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        
+      PlayerView.switchTargetView(player.exoPlayer,playerViewFullscreen,null);
+      ViewGroup viewHolder = (ViewGroup)playerViewFullscreen.getParent();
+      viewHolder.removeView(playerViewFullscreen);
+      player.exoPlayer.setVideoSurface(player.surface);
+      player.exoPlayer.play();
+      isFullScreen = false;
+      
+      View decorView = activity.getWindow().getDecorView();
+      decorView.setSystemUiVisibility(initial);
+    }
     }
 
     private interface KeyForAssetFn {
@@ -233,13 +313,15 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
     private final TextureRegistry textureRegistry;
 
     FlutterState(
-        Context applicationContext,
-        BinaryMessenger messenger,
-        KeyForAssetFn keyForAsset,
-        KeyForAssetAndPackageName keyForAssetAndPackageName,
-        TextureRegistry textureRegistry) {
+            Context applicationContext,
+            BinaryMessenger messenger,
+            KeyForAssetFn keyForAsset,
+            KeyForAssetAndPackageName keyForAssetAndPackageName,
+            TextureRegistry textureRegistry) {
       this.applicationContext = applicationContext;
       this.binaryMessenger = messenger;
+
+      
       this.keyForAsset = keyForAsset;
       this.keyForAssetAndPackageName = keyForAssetAndPackageName;
       this.textureRegistry = textureRegistry;

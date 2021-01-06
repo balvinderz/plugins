@@ -243,6 +243,18 @@ class _BumbleBeeRemoteVideoState extends State<_BumbleBeeRemoteVideo> {
         children: <Widget>[
           Container(padding: const EdgeInsets.only(top: 20.0)),
           const Text('With remote mp4'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(child: Text("go fullscreen",style: TextStyle(
+              fontSize: 26
+            ),),onTap: () async {
+             await _controller.goFullScreen();
+              await Future.delayed(Duration(seconds: 5));
+              await _controller.exitFullScreen();
+
+
+            },),
+          ),
           Container(
             padding: const EdgeInsets.all(20),
             child: AspectRatio(

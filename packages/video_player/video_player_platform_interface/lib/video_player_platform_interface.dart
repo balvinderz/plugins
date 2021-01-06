@@ -109,6 +109,18 @@ abstract class VideoPlayerPlatform {
   Future<Duration> getPosition(int textureId) {
     throw UnimplementedError('getPosition() has not been implemented.');
   }
+  ///  doc message
+  Future<void> goFullScreen(int textureId)
+  {
+    throw UnimplementedError("soja");
+  }
+  ///  doc message
+  Future<void> exitFullScreen(int textureId)
+  {
+    throw UnimplementedError("soja");
+
+  }
+
 
   /// Returns a widget displaying the video with a given textureID.
   Widget buildView(int textureId) {

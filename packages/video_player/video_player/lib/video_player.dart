@@ -383,7 +383,14 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     value = value.copyWith(isLooping: looping);
     await _applyLooping();
   }
-
+  /// doc
+  Future<void> goFullScreen() async{
+    return _videoPlayerPlatform.goFullScreen(_textureId);
+  }
+  /// doc
+  Future<void> exitFullScreen() async{
+    return _videoPlayerPlatform.exitFullScreen(_textureId);
+  }
   /// Pauses the video.
   Future<void> pause() async {
     value = value.copyWith(isPlaying: false);
