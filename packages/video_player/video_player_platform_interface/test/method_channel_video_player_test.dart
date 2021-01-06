@@ -90,6 +90,19 @@ class _ApiLogger implements TestHostVideoPlayerApi {
     log.add('setPlaybackSpeed');
     playbackSpeedMessage = arg;
   }
+
+  @override
+  void exitFullScreen(TextureMessage arg) {
+    // TODO: implement exitFullScreen
+    log.add('exitFullScreen');
+    textureMessage = arg;
+  }
+
+  @override
+  void goFullScreen(TextureMessage arg) {
+    log.add('goFullScreen');
+    textureMessage = arg;
+  }
 }
 
 void main() {

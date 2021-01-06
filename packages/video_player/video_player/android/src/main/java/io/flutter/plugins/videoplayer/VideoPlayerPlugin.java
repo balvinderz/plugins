@@ -7,6 +7,8 @@ package io.flutter.plugins.videoplayer;
 import android.content.Context;
 import android.os.Build;
 import android.util.LongSparseArray;
+import android.view.WindowManager;
+
 import io.flutter.FlutterInjector;
 import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -205,7 +207,17 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi {
     options.mixWithOthers = arg.getMixWithOthers();
   }
 
-  private interface KeyForAssetFn {
+    @Override
+    public void goFullScreen(TextureMessage arg) {
+
+    }
+
+    @Override
+    public void exitFullScreen(TextureMessage arg) {
+
+    }
+
+    private interface KeyForAssetFn {
     String get(String asset);
   }
 

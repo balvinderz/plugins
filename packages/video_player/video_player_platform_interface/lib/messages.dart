@@ -8,6 +8,7 @@ import 'dart:typed_data' show Uint8List, Int32List, Int64List, Float64List;
 
 class TextureMessage {
   int? textureId;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -28,6 +29,7 @@ class CreateMessage {
   String? uri;
   String? packageName;
   String? formatHint;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -52,6 +54,7 @@ class CreateMessage {
 class LoopingMessage {
   int? textureId;
   bool? isLooping;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -72,6 +75,7 @@ class LoopingMessage {
 class VolumeMessage {
   int? textureId;
   double? volume;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -92,6 +96,7 @@ class VolumeMessage {
 class PlaybackSpeedMessage {
   int? textureId;
   double? speed;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -112,6 +117,7 @@ class PlaybackSpeedMessage {
 class PositionMessage {
   int? textureId;
   int? position;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -131,6 +137,7 @@ class PositionMessage {
 
 class MixWithOthersMessage {
   bool? mixWithOthers;
+
   // ignore: unused_element
   Map<dynamic, dynamic> _toMap() {
     final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
@@ -389,20 +396,92 @@ class VideoPlayerApi {
       // noop
     }
   }
+
+
+  Future<void> goFullScreen(TextureMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+    BasicMessageChannel<dynamic>(
+        'dev.flutter.pigeon.VideoPlayerApi.goFullScreen',
+        StandardMessageCodec());
+    final Map<Object, Object> replyMap = await channel.send(requestMap) as Map<
+        Object,
+        Object>;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object, Object> error = replyMap['error'] as Map<Object,
+          Object>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String,
+        details: error['details'],
+      );
+    } else {
+      // noop
+    }
+  }
+
+  Future<void> exitFullScreen(TextureMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+    BasicMessageChannel<dynamic>(
+        'dev.flutter.pigeon.VideoPlayerApi.exitFullScreen',
+        StandardMessageCodec());
+    final Map<Object, Object> replyMap = await channel.send(requestMap) as Map<
+        Object,
+        Object>;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<Object, Object> error = replyMap['error'] as Map<Object,
+          Object>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String,
+        details: error['details'],
+      );
+    } else {
+      // noop
+    }
+  }
 }
 
 abstract class TestHostVideoPlayerApi {
   void initialize();
+
   TextureMessage create(CreateMessage arg);
+
   void dispose(TextureMessage arg);
+
   void setLooping(LoopingMessage arg);
+
   void setVolume(VolumeMessage arg);
+
   void setPlaybackSpeed(PlaybackSpeedMessage arg);
+
   void play(TextureMessage arg);
+
   PositionMessage position(TextureMessage arg);
+
   void seekTo(PositionMessage arg);
+
   void pause(TextureMessage arg);
+
   void setMixWithOthers(MixWithOthersMessage arg);
+
+  void goFullScreen(TextureMessage arg);
+
+  void exitFullScreen(TextureMessage arg);
+
   static void setup(TestHostVideoPlayerApi? api) {
     {
       const BasicMessageChannel<dynamic> channel = BasicMessageChannel<dynamic>(
@@ -425,7 +504,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final CreateMessage input = CreateMessage._fromMap(mapMessage);
           final TextureMessage output = api.create(input);
           return <dynamic, dynamic>{'result': output._toMap()};
@@ -440,7 +519,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final TextureMessage input = TextureMessage._fromMap(mapMessage);
           api.dispose(input);
           return <dynamic, dynamic>{};
@@ -456,7 +535,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final LoopingMessage input = LoopingMessage._fromMap(mapMessage);
           api.setLooping(input);
           return <dynamic, dynamic>{};
@@ -472,7 +551,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final VolumeMessage input = VolumeMessage._fromMap(mapMessage);
           api.setVolume(input);
           return <dynamic, dynamic>{};
@@ -488,9 +567,9 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final PlaybackSpeedMessage input =
-              PlaybackSpeedMessage._fromMap(mapMessage);
+          PlaybackSpeedMessage._fromMap(mapMessage);
           api.setPlaybackSpeed(input);
           return <dynamic, dynamic>{};
         });
@@ -504,7 +583,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final TextureMessage input = TextureMessage._fromMap(mapMessage);
           api.play(input);
           return <dynamic, dynamic>{};
@@ -519,7 +598,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final TextureMessage input = TextureMessage._fromMap(mapMessage);
           final PositionMessage output = api.position(input);
           return <dynamic, dynamic>{'result': output._toMap()};
@@ -534,7 +613,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final PositionMessage input = PositionMessage._fromMap(mapMessage);
           api.seekTo(input);
           return <dynamic, dynamic>{};
@@ -549,7 +628,7 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final TextureMessage input = TextureMessage._fromMap(mapMessage);
           api.pause(input);
           return <dynamic, dynamic>{};
@@ -565,10 +644,42 @@ abstract class TestHostVideoPlayerApi {
       } else {
         channel.setMockMessageHandler((dynamic message) async {
           final Map<dynamic, dynamic> mapMessage =
-              message as Map<dynamic, dynamic>;
+          message as Map<dynamic, dynamic>;
           final MixWithOthersMessage input =
-              MixWithOthersMessage._fromMap(mapMessage);
+          MixWithOthersMessage._fromMap(mapMessage);
           api.setMixWithOthers(input);
+          return <dynamic, dynamic>{};
+        });
+      }
+    }
+    {
+      const BasicMessageChannel<dynamic> channel = BasicMessageChannel<dynamic>(
+          'dev.flutter.pigeon.VideoPlayerApi.goFullScreen',
+          StandardMessageCodec());
+      if (api == null) {
+        channel.setMockMessageHandler(null);
+      } else {
+        channel.setMockMessageHandler((dynamic message) async {
+          final Map<dynamic, dynamic> mapMessage =
+          message as Map<dynamic, dynamic>;
+          final TextureMessage input = TextureMessage._fromMap(mapMessage);
+          api.goFullScreen(input);
+          return <dynamic, dynamic>{};
+        });
+      }
+    }
+    {
+      const BasicMessageChannel<dynamic> channel = BasicMessageChannel<dynamic>(
+          'dev.flutter.pigeon.VideoPlayerApi.exitFullScreen',
+          StandardMessageCodec());
+      if (api == null) {
+        channel.setMockMessageHandler(null);
+      } else {
+        channel.setMockMessageHandler((dynamic message) async {
+          final Map<dynamic, dynamic> mapMessage =
+          message as Map<dynamic, dynamic>;
+          final TextureMessage input = TextureMessage._fromMap(mapMessage);
+          api.exitFullScreen(input);
           return <dynamic, dynamic>{};
         });
       }

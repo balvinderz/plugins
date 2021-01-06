@@ -50,6 +50,8 @@ abstract class VideoPlayerApi {
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);
+  void goFullScreen(TextureMessage msg);
+  void exitFullScreen(TextureMessage msg);
 }
 
 void configurePigeon(PigeonOptions opts) {

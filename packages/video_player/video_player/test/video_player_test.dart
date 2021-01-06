@@ -734,6 +734,18 @@ class FakeVideoPlayerPlatform extends TestHostVideoPlayerApi {
   void setMixWithOthers(MixWithOthersMessage arg) {
     calls.add('setMixWithOthers');
   }
+
+  @override
+  void exitFullScreen(TextureMessage arg) {
+    // TODO: implement exitFullScreen
+    calls.add('exitFullScreen');
+  }
+
+  @override
+  void goFullScreen(TextureMessage arg) {
+    // TODO: implement goFullScreen
+    calls.add('goFullScreen');
+  }
 }
 
 class FakeVideoEventStream {
