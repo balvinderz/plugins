@@ -72,6 +72,25 @@ class LoopingMessage {
   }
 }
 
+class FullScreenMessage {
+  bool? isFullScreen;
+
+  // ignore: unused_element
+  Map<dynamic, dynamic> _toMap() {
+    final Map<dynamic, dynamic> pigeonMap = <dynamic, dynamic>{};
+    pigeonMap['isFullScreen'] = isFullScreen;
+    return pigeonMap;
+  }
+
+
+  // ignore: unused_element
+  static FullScreenMessage _fromMap(Map<dynamic, dynamic> pigeonMap) {
+    final FullScreenMessage result = FullScreenMessage();
+    result.isFullScreen = pigeonMap['isFullScreen'];
+    return result;
+  }
+}
+
 class VolumeMessage {
   int? textureId;
   double? volume;
@@ -400,12 +419,12 @@ class VideoPlayerApi {
 
   Future<void> goFullScreen(TextureMessage arg) async {
     final Map<dynamic, dynamic> requestMap = arg._toMap();
-
     const BasicMessageChannel<dynamic> channel =
     BasicMessageChannel<dynamic>(
         'dev.flutter.pigeon.VideoPlayerApi.goFullScreen',
         StandardMessageCodec());
-    final Map<dynamic,dynamic> replyMap = await channel.send(requestMap) as Map<
+    final Map<dynamic, dynamic> replyMap = await channel.send(
+        requestMap) as Map<
         dynamic,
         dynamic>;
     if (replyMap == null) {
@@ -433,7 +452,8 @@ class VideoPlayerApi {
     BasicMessageChannel<dynamic>(
         'dev.flutter.pigeon.VideoPlayerApi.exitFullScreen',
         StandardMessageCodec());
-    final Map<dynamic,dynamic> replyMap = await channel.send(requestMap) as Map<
+    final Map<dynamic, dynamic> replyMap = await channel.send(
+        requestMap) as Map<
         dynamic,
         dynamic>;
     if (replyMap == null) {
@@ -452,6 +472,34 @@ class VideoPlayerApi {
       );
     } else {
       // noop
+    }
+  }
+
+  Future<FullScreenMessage> isFullScreen(TextureMessage arg) async {
+    final Map<dynamic, dynamic> requestMap = arg._toMap();
+    const BasicMessageChannel<dynamic> channel =
+    BasicMessageChannel<dynamic>(
+        'dev.flutter.pigeon.VideoPlayerApi.isFullScreen',
+        StandardMessageCodec());
+    final Map<dynamic, dynamic> replyMap = await channel.send(
+        requestMap) as Map<dynamic, dynamic>;
+    if (replyMap == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+        details: null,
+      );
+    } else if (replyMap['error'] != null) {
+      final Map<dynamic, dynamic> error = replyMap['error'] as Map<
+          dynamic,
+          dynamic>;
+      throw PlatformException(
+        code: error['code'] as String,
+        message: error['message'] as String,
+        details: error['details'],
+      );
+    } else {
+      return FullScreenMessage._fromMap(replyMap['result']);
     }
   }
 }

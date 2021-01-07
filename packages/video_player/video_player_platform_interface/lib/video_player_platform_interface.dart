@@ -109,16 +109,20 @@ abstract class VideoPlayerPlatform {
   Future<Duration> getPosition(int textureId) {
     throw UnimplementedError('getPosition() has not been implemented.');
   }
+
   ///  doc message
-  Future<void> goFullScreen(int textureId)
-  {
+  Future<void> goFullScreen(int textureId) {
     throw UnimplementedError("soja");
   }
-  ///  doc message
-  Future<void> exitFullScreen(int textureId)
-  {
-    throw UnimplementedError("soja");
 
+  ///doc message
+  Future<bool?> isFullScreen(int textureId) {
+    throw UnimplementedError("soja");
+  }
+
+  ///  doc message
+  Future<void> exitFullScreen(int textureId) {
+    throw UnimplementedError("soja");
   }
 
 
@@ -345,10 +349,10 @@ class DurationRange {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DurationRange &&
-          runtimeType == other.runtimeType &&
-          start == other.start &&
-          end == other.end;
+          other is DurationRange &&
+              runtimeType == other.runtimeType &&
+              start == other.start &&
+              end == other.end;
 
   @override
   int get hashCode => start.hashCode ^ end.hashCode;

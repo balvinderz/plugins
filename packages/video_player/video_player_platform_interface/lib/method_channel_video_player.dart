@@ -31,6 +31,14 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
     return _api.exitFullScreen(TextureMessage()..textureId = textureId);
   }
   @override
+  Future<bool?> isFullScreen(int textureId) async {
+    // TODO: implement isFullScreen
+    FullScreenMessage message = await _api.isFullScreen(TextureMessage()..textureId =textureId);
+    print(message.isFullScreen);
+    return message.isFullScreen;
+
+  }
+  @override
   Future<void> dispose(int textureId) {
     return _api.dispose(TextureMessage()..textureId = textureId);
   }
