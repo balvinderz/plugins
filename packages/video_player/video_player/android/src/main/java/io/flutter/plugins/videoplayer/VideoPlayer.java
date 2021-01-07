@@ -3,10 +3,16 @@ package io.flutter.plugins.videoplayer;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_ALL;
 import static com.google.android.exoplayer2.Player.REPEAT_MODE_OFF;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Surface;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -23,6 +29,7 @@ import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -42,9 +49,9 @@ final class VideoPlayer {
   private static final String FORMAT_HLS = "hls";
   private static final String FORMAT_OTHER = "other";
 
-  public SimpleExoPlayer exoPlayer;
+  private  final SimpleExoPlayer exoPlayer;
 
-  public Surface surface;
+  private Surface surface;
 
   private final TextureRegistry.SurfaceTextureEntry textureEntry;
 
@@ -55,17 +62,21 @@ final class VideoPlayer {
   private boolean isInitialized = false;
 
   private final VideoPlayerOptions options;
-
+    private  Context context;
+    private  Activity activity;
   VideoPlayer(
-      Context context,
-      EventChannel eventChannel,
-      TextureRegistry.SurfaceTextureEntry textureEntry,
-      String dataSource,
-      String formatHint,
-      VideoPlayerOptions options) {
+          Context context,
+          EventChannel eventChannel,
+          TextureRegistry.SurfaceTextureEntry textureEntry,
+          String dataSource,
+          String formatHint,
+          VideoPlayerOptions options, Activity activity) {
     this.eventChannel = eventChannel;
     this.textureEntry = textureEntry;
     this.options = options;
+    this.context = context;
+    this.activity =activity;
+
 
     exoPlayer = new SimpleExoPlayer.Builder(context).build();
 
@@ -300,4 +311,52 @@ final class VideoPlayer {
       exoPlayer.release();
     }
   }
+  PlayerView playerViewFullscreen;
+  private  int initial;
+  private  boolean isFullScreen = false;
+  void goFullScreen(){
+      playerViewFullscreen = new PlayerView(context);
+      ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+      playerViewFullscreen.setLayoutParams(layoutParams);
+      //playerViewFullscreen.setVisibility(View.GONE);
+      playerViewFullscreen.setBackgroundColor(Color.BLACK);
+      View decorView =activity.getWindow().getDecorView();
+      initial = decorView.getSystemUiVisibility();
+      int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+      decorView.setSystemUiVisibility(uiOptions);
+
+
+      activity.addContentView(playerViewFullscreen, layoutParams);
+      PlayerView.switchTargetView(exoPlayer,null,playerViewFullscreen);
+
+      isFullScreen = true;
+      ImageButton exitFullScreenButton =activity.findViewById(R.id.exo_fullscreen_exit);
+      exitFullScreenButton.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              exitFullScreen();
+          }
+      });
+  }
+  void exitFullScreen(){
+      if(isFullScreen )
+      {
+
+          PlayerView.switchTargetView(exoPlayer,playerViewFullscreen,null);
+          ViewGroup viewHolder = (ViewGroup)playerViewFullscreen.getParent();
+          viewHolder.removeView(playerViewFullscreen);
+          exoPlayer.setVideoSurface(surface);
+          exoPlayer.play();
+          isFullScreen = false;
+
+          View decorView = activity.getWindow().getDecorView();
+          decorView.setSystemUiVisibility(initial);
+      }
+  }
+
+    public Boolean getIsFullScreen() {
+        return isFullScreen;
+
+    }
 }

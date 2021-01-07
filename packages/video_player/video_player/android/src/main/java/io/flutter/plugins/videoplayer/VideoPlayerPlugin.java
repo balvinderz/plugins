@@ -12,6 +12,7 @@ import android.util.LongSparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -19,6 +20,7 @@ import android.widget.RelativeLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 
 import io.flutter.FlutterInjector;
@@ -40,6 +42,8 @@ import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
 import io.flutter.view.TextureRegistry;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+
 import javax.net.ssl.HttpsURLConnection;
 
 /** Android platform implementation of the VideoPlayerPlugin. */
@@ -67,8 +71,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi,Activity
 
     flutterState.startListening(this, registrar.messenger());
   }
-  boolean isFullScreen ;
-  
+
   /** Registers this with the stable v1 embedding. Will not respond to lifecycle events. */
   @SuppressWarnings("deprecation")
   public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
@@ -178,7 +181,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi,Activity
               handle,
               "asset:///" + assetLookupKey,
               null,
-              options);
+              options,activity);
     } else {
       player =
           new VideoPlayer(
@@ -187,7 +190,7 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi,Activity
               handle,
               arg.getUri(),
               arg.getFormatHint(),
-              options);
+              options,activity);
     }
     videoPlayers.put(handle.id(), player);
 
@@ -244,57 +247,28 @@ public class VideoPlayerPlugin implements FlutterPlugin, VideoPlayerApi,Activity
   public void setMixWithOthers(MixWithOthersMessage arg) {
     options.mixWithOthers = arg.getMixWithOthers();
   }
-  int initial = 0;
-  PlayerView playerViewFullscreen;
 
   @Override
     public void goFullScreen(TextureMessage arg) {
       VideoPlayer player = videoPlayers.get(arg.getTextureId());
-//      PlayerView.switchTargetView(player,player);
-      playerViewFullscreen = new PlayerView(flutterState.applicationContext);
-      ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-      playerViewFullscreen.setLayoutParams(layoutParams);
-      //playerViewFullscreen.setVisibility(View.GONE);
-      playerViewFullscreen.setBackgroundColor(Color.BLACK);
-      View decorView =activity. getWindow().getDecorView();
-      initial = decorView.getSystemUiVisibility();
-      int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-      decorView.setSystemUiVisibility(uiOptions);
-      ImageView imageView = new ImageView(flutterState.applicationContext);
-      imageView.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.exo_controls_fullscreen_exit));
-      imageView.setMaxWidth(100);
-      imageView.setMaxHeight(100);
-      playerViewFullscreen.addView(imageView,new RelativeLayout.LayoutParams(100,100));
-      imageView.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          exitFullScreen(arg);
-        }
-      });
-        activity.addContentView(playerViewFullscreen, layoutParams);
-      PlayerView.switchTargetView(player.exoPlayer,null,playerViewFullscreen);
-      isFullScreen = true;
-      
+      player.goFullScreen();
+
 
     }
 
     @Override
     public void exitFullScreen(TextureMessage arg) {
-    if(isFullScreen )
-    {
-      VideoPlayer player = videoPlayers.get(arg.getTextureId());
-        
-      PlayerView.switchTargetView(player.exoPlayer,playerViewFullscreen,null);
-      ViewGroup viewHolder = (ViewGroup)playerViewFullscreen.getParent();
-      viewHolder.removeView(playerViewFullscreen);
-      player.exoPlayer.setVideoSurface(player.surface);
-      player.exoPlayer.play();
-      isFullScreen = false;
-      
-      View decorView = activity.getWindow().getDecorView();
-      decorView.setSystemUiVisibility(initial);
+        VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        player.exitFullScreen();
     }
+
+    @Override
+    public Messages.FullScreenMessage isFullScreen(TextureMessage arg) {
+        VideoPlayer player = videoPlayers.get(arg.getTextureId());
+        Messages.FullScreenMessage message = new Messages.FullScreenMessage();
+        message.setIsFullScreen(player.getIsFullScreen());
+        return message;
+
     }
 
     private interface KeyForAssetFn {

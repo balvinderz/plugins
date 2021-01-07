@@ -50,6 +50,10 @@ static NSDictionary* wrapResult(NSDictionary *result, FlutterError *error) {
 +(FLTMixWithOthersMessage*)fromMap:(NSDictionary*)dict;
 -(NSDictionary*)toMap;
 @end
+@interface FLTFullScreenMessage ()
++(FLTFullScreenMessage*)fromMap:(NSDictionary*)dict;
+-(NSDictionary*)toMap;
+@end
 
 @implementation FLTTextureMessage
 +(FLTTextureMessage*)fromMap:(NSDictionary*)dict {
@@ -174,6 +178,20 @@ static NSDictionary* wrapResult(NSDictionary *result, FlutterError *error) {
 }
 -(NSDictionary*)toMap {
   return [NSDictionary dictionaryWithObjectsAndKeys:(self.mixWithOthers ? self.mixWithOthers : [NSNull null]), @"mixWithOthers", nil];
+}
+@end
+
+@implementation FLTFullScreenMessage
++(FLTFullScreenMessage*)fromMap:(NSDictionary*)dict {
+  FLTFullScreenMessage* result = [[FLTFullScreenMessage alloc] init];
+  result.isFullScreen = dict[@"isFullScreen"];
+  if ((NSNull *)result.isFullScreen == [NSNull null]) {
+    result.isFullScreen = nil;
+  }
+  return result;
+}
+-(NSDictionary*)toMap {
+  return [NSDictionary dictionaryWithObjectsAndKeys:(self.isFullScreen ? self.isFullScreen : [NSNull null]), @"isFullScreen", nil];
 }
 @end
 
@@ -392,6 +410,23 @@ void FLTVideoPlayerApiSetup(id<FlutterBinaryMessenger> binaryMessenger, id<FLTVi
         FLTTextureMessage *input = [FLTTextureMessage fromMap:message];
         [api exitFullScreen:input error:&error];
         callback(wrapResult(nil, error));
+      }];
+    }
+    else {
+      [channel setMessageHandler:nil];
+    }
+  }
+  {
+    FlutterBasicMessageChannel *channel =
+      [FlutterBasicMessageChannel
+        messageChannelWithName:@"dev.flutter.pigeon.VideoPlayerApi.isFullScreen"
+        binaryMessenger:binaryMessenger];
+    if (api) {
+      [channel setMessageHandler:^(id _Nullable message, FlutterReply callback) {
+        FlutterError *error;
+        FLTTextureMessage *input = [FLTTextureMessage fromMap:message];
+        FLTFullScreenMessage *output = [api isFullScreen:input error:&error];
+        callback(wrapResult([output toMap], error));
       }];
     }
     else {
