@@ -599,9 +599,14 @@ UIViewController *viewController;
     
     playerController.player  = [player player];
     [viewController presentViewController:playerController animated:true completion:^{
-        
     }];
-    
+}
+- (FLTFullScreenMessage*)isFullScreen:(FLTTextureMessage*) input error:(FlutterError**)error{
+      FLTFullScreenMessage * result = [[FLTFullScreenMessage alloc] init];
+      result.isFullScreen = false;
+      return result;
+
+
 }
 - (void)exitFullScreen:(FLTTextureMessage*) input error:(FlutterError**)error{
     

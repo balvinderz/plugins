@@ -653,11 +653,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
         ? Container()
         : WillPopScope(
         onWillPop: () async {
-          print("ye chala");
           bool? isFullScreen = await _videoPlayerPlatform.isFullScreen(_textureId);
         print(isFullScreen);
           if (isFullScreen!) {
-            print("iske a ndar aya");
             await _videoPlayerPlatform.exitFullScreen(_textureId);
             return false;
           }
