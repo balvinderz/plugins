@@ -103,6 +103,11 @@ class _ApiLogger implements TestHostVideoPlayerApi {
     log.add('goFullScreen');
     textureMessage = arg;
   }
+  @override
+  void isFullScreen(TextureMessage arg) {
+    log.add('goFullScreen');
+    textureMessage = arg;
+  }
 }
 
 void main() {

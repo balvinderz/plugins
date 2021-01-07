@@ -18,8 +18,8 @@ import 'src/closed_caption_file.dart';
 export 'src/closed_caption_file.dart';
 
 final VideoPlayerPlatform _videoPlayerPlatform = VideoPlayerPlatform.instance
-  // This will clear all open videos on the platform when a full restart is
-  // performed.
+// This will clear all open videos on the platform when a full restart is
+// performed.
   ..init();
 
 /// The duration, current position, buffering state, error state and settings
@@ -49,9 +49,9 @@ class VideoPlayerValue {
   /// Returns an instance with the given [errorDescription].
   VideoPlayerValue.erroneous(String errorDescription)
       : this(
-            duration: Duration.zero,
-            isInitialized: false,
-            errorDescription: errorDescription);
+      duration: Duration.zero,
+      isInitialized: false,
+      errorDescription: errorDescription);
 
   /// The total duration of the video.
   ///
@@ -383,13 +383,19 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     value = value.copyWith(isLooping: looping);
     await _applyLooping();
   }
+
   /// doc
-  Future<void> goFullScreen() async{
-    return _videoPlayerPlatform.goFullScreen(_textureId);
+  Future<void> goFullScreen() async {
+    await _videoPlayerPlatform.goFullScreen(_textureId);
   }
+
   /// doc
-  Future<void> exitFullScreen() async{
-    return _videoPlayerPlatform.exitFullScreen(_textureId);
+  Future<void> exitFullScreen() async {
+    await _videoPlayerPlatform.exitFullScreen(_textureId);
+  }
+  ///doc
+  Future<bool?> isFullScreen() async{
+    return await _videoPlayerPlatform.isFullScreen(_textureId);
   }
   /// Pauses the video.
   Future<void> pause() async {
@@ -415,7 +421,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
       _timer?.cancel();
       _timer = Timer.periodic(
         const Duration(milliseconds: 500),
-        (Timer timer) async {
+            (Timer timer) async {
           if (_isDisposed) {
             return;
           }
@@ -623,6 +629,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     _textureId = widget.controller.textureId;
     // Need to listen for initialization events since the actual texture ID
     // becomes available after asynchronous initialization finishes.
+    // becomes available after asynchronous initialization finishes.
     widget.controller.addListener(_listener);
   }
 
@@ -644,7 +651,20 @@ class _VideoPlayerState extends State<VideoPlayer> {
   Widget build(BuildContext context) {
     return _textureId == VideoPlayerController.kUninitializedTextureId
         ? Container()
-        : _videoPlayerPlatform.buildView(_textureId);
+        : WillPopScope(
+        onWillPop: () async {
+          print("ye chala");
+          bool? isFullScreen = await _videoPlayerPlatform.isFullScreen(_textureId);
+        print(isFullScreen);
+          if (isFullScreen!) {
+            print("iske a ndar aya");
+            await _videoPlayerPlatform.exitFullScreen(_textureId);
+            return false;
+          }
+          print("idhar aya");
+          return true;
+        },
+        child: _videoPlayerPlatform.buildView(_textureId));
   }
 }
 
@@ -763,8 +783,7 @@ class VideoProgressIndicator extends StatefulWidget {
   /// Defaults will be used for everything except [controller] if they're not
   /// provided. [allowScrubbing] defaults to false, and [padding] will default
   /// to `top: 5.0`.
-  VideoProgressIndicator(
-    this.controller, {
+  VideoProgressIndicator(this.controller, {
     this.colors = const VideoProgressColors(),
     required this.allowScrubbing,
     this.padding = const EdgeInsets.only(top: 5.0),
@@ -913,10 +932,13 @@ class ClosedCaption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle effectiveTextStyle = textStyle ??
-        DefaultTextStyle.of(context).style.copyWith(
-              fontSize: 36.0,
-              color: Colors.white,
-            );
+        DefaultTextStyle
+            .of(context)
+            .style
+            .copyWith(
+          fontSize: 36.0,
+          color: Colors.white,
+        );
 
     if (text == null) {
       return SizedBox.shrink();

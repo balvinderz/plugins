@@ -195,6 +195,25 @@ public class Messages {
     }
   }
 
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static class FullScreenMessage {
+    private Boolean isFullScreen;
+    public Boolean getIsFullScreen() { return isFullScreen; }
+    public void setIsFullScreen(Boolean setterArg) { this.isFullScreen = setterArg; }
+
+    HashMap toMap() {
+      HashMap<String, Object> toMapResult = new HashMap<>();
+      toMapResult.put("isFullScreen", isFullScreen);
+      return toMapResult;
+    }
+    static FullScreenMessage fromMap(HashMap map) {
+      FullScreenMessage fromMapResult = new FullScreenMessage();
+      Object isFullScreen = map.get("isFullScreen");
+      fromMapResult.isFullScreen = (Boolean)isFullScreen;
+      return fromMapResult;
+    }
+  }
+
   /** Generated interface from Pigeon that represents a handler of messages from Flutter.*/
   public interface VideoPlayerApi {
     void initialize();
@@ -210,6 +229,7 @@ public class Messages {
     void setMixWithOthers(MixWithOthersMessage arg);
     void goFullScreen(TextureMessage arg);
     void exitFullScreen(TextureMessage arg);
+    FullScreenMessage isFullScreen(TextureMessage arg);
 
     /** Sets up an instance of `VideoPlayerApi` to handle messages through the `binaryMessenger` */
     static void setup(BinaryMessenger binaryMessenger, VideoPlayerApi api) {
@@ -474,6 +494,27 @@ public class Messages {
               TextureMessage input = TextureMessage.fromMap((HashMap)message);
               api.exitFullScreen(input);
               wrapped.put("result", null);
+            }
+            catch (Exception exception) {
+              wrapped.put("error", wrapError(exception));
+            }
+            reply.reply(wrapped);
+          });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.VideoPlayerApi.isFullScreen", new StandardMessageCodec());
+        if (api != null) {
+          channel.setMessageHandler((message, reply) -> {
+            HashMap<String, HashMap> wrapped = new HashMap<>();
+            try {
+              @SuppressWarnings("ConstantConditions")
+              TextureMessage input = TextureMessage.fromMap((HashMap)message);
+              FullScreenMessage output = api.isFullScreen(input);
+              wrapped.put("result", output.toMap());
             }
             catch (Exception exception) {
               wrapped.put("error", wrapError(exception));

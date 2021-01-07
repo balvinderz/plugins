@@ -54,6 +54,7 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
     _videoPlayers.remove(textureId);
     return null;
   }
+
   void _disposeAllPlayers() {
     _videoPlayers.values
         .forEach((_VideoPlayer videoPlayer) => videoPlayer.dispose());
@@ -127,20 +128,27 @@ class VideoPlayerPlugin extends VideoPlayerPlatform {
   Future<void> seekTo(int textureId, Duration position) async {
     return _videoPlayers[textureId]!.seekTo(position);
   }
+
   @override
   Future<void> goFullScreen(int textureId) {
     return _videoPlayers[textureId]!.goFullScreen();
   }
+
   @override
   Future<void> exitFullScreen(int textureId) {
-    // TODO: implement exitFullScreen
     return _videoPlayers[textureId]!.exitFullScreen();
+  }
+  @override
+  Future<bool?> isFullScreen(int textureId) {
+    // TODO: implement isFullScreen
+    return _videoPlayers[textureId]!.isFullScreen();
 
   }
   @override
-  Future<void> setMixWithOthers(bool mixWithOthers)  async {
-    return ;
+  Future<void> setMixWithOthers(bool mixWithOthers) async {
+    return;
   }
+
   @override
   Future<Duration> getPosition(int textureId) async {
     _videoPlayers[textureId]!.sendBufferingUpdate();
@@ -290,8 +298,7 @@ class _VideoPlayer {
   }
 
   Future<void> setMixWithOthers(bool mixWithOthers) async {
-    return ;
-
+    return;
   }
 
   void sendInitialized() {
@@ -312,6 +319,8 @@ class _VideoPlayer {
   void dispose() {
     videoElement.removeAttribute('src');
     videoElement.load();
+    fullScreenEventSubscription?.cancel();
+
   }
 
   List<DurationRange> _toDurationRange(TimeRanges buffered) {
@@ -324,14 +333,23 @@ class _VideoPlayer {
     }
     return durationRange;
   }
+  StreamSubscription<Event>? fullScreenEventSubscription;
 
-  Future<void> goFullScreen() async{
+  Future<void> goFullScreen() async {
     videoElement.enterFullscreen();
 
+    fullScreenEventSubscription = videoElement.onFullscreenChange.listen((event) {
+      _isFullScreen = document.fullscreenElement != null;
+    });
   }
-  Future<void> exitFullScreen() async{
+
+  bool _isFullScreen = false;
+
+  Future<void> exitFullScreen() async {
     videoElement.exitFullscreen();
-
   }
 
+  Future<bool> isFullScreen() async {
+    return _isFullScreen;
+  }
 }
